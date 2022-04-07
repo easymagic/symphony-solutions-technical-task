@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "express-draft": "^1.0.4"
+  }
+}
