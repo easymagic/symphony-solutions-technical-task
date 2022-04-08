@@ -12,6 +12,11 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
     }
+
+    async emailFormatted(){
+      // await this.update({email: this.email + '--modified.123...'});
+      return this.email + ' Formatted.';
+    }
   }
   Contact.init({
     email: DataTypes.STRING,
