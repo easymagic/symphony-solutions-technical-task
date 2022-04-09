@@ -5,12 +5,16 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "babel-dev": "nodemon --exec babel-node app.js"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@babel/core": "^7.17.9",
+    "@babel/node": "^7.16.8",
+    "@babel/preset-env": "^7.16.11",
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
     "http-errors": "^2.0.0",
@@ -18,6 +22,7 @@
     "mysql2": "^2.3.3",
     "node-fetch": "^2.6.7",
     "sequelize": "^6.18.0",
+    "socket.io": "^4.4.1",
     "ws": "^8.5.0"
   },
   "devDependencies": {

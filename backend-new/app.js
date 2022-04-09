@@ -1,5 +1,6 @@
-const express = require("express");
-const createError = require("http-errors");
+import express from "express";
+import createError from "http-errors";
+
 const morgan = require("morgan");
 require("dotenv").config();
 
@@ -15,10 +16,20 @@ const TARGET_CURRENCY = "USD";
 
 const app = express();
 
-const server = require('http').createServer(app);
-const WebSocket = require('ws');
+const server = require("http").createServer(app);
 
-const wwebSocketServer = new WebSocket.Server({server});
+const io = require('socket.io')(server,{
+  cors:{origin:"*"}
+});
+
+io.on("connection",(socket)=>{
+  console.log("Client just got connected...");
+  socket.on('message',()=>{
+     
+  });
+});
+
+// server.listen(9000);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -37,7 +48,7 @@ const fetchAndStoreLatestRates = async () => {
       });
     }
   }
-  console.log("Synchronized from crypto-exchange server");
+  // console.log("Synchronized from crypto-exchange server");
 };
 
 const fetchStoredRates = async () => {
@@ -47,6 +58,7 @@ const fetchStoredRates = async () => {
 const scheduleSync = async () => {
   await fetchAndStoreLatestRates();
   let rates = await fetchStoredRates();
+  io.emit('message',rates);
   // console.log(rates);
   setTimeout(scheduleSync, CRYPTO_PULL_INTERVAL * 1000 * 60);
 };
