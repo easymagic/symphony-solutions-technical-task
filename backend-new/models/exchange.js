@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Contact extends Model {
+  class Exchange extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -12,19 +12,14 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
     }
-
-    async emailFormatted(){
-      // await this.update({email: this.email + '--modified.123...'});
-      return this.email + ' Formatted.';
-    }
   }
-  Contact.init({
-    email: DataTypes.STRING,
-    phone: DataTypes.STRING,
-    name: DataTypes.STRING
+  Exchange.init({
+    crypto: DataTypes.STRING,
+    currency: DataTypes.STRING,
+    rate: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'Contact',
+    modelName: 'Exchange',
   });
-  return Contact;
+  return Exchange;
 };
