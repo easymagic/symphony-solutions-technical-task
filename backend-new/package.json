@@ -4,17 +4,15 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "node app.prod.js",
     "dev": "nodemon app.js",
-    "babel-dev": "nodemon --exec babel-node app.js"
+    "babel-dev": "nodemon --exec babel-node app.js",
+    "build": "babel app.js --out-file app.prod.js"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@babel/core": "^7.17.9",
-    "@babel/node": "^7.16.8",
-    "@babel/preset-env": "^7.16.11",
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
     "http-errors": "^2.0.0",
@@ -26,6 +24,9 @@
     "ws": "^8.5.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.17.9",
+    "@babel/node": "^7.16.8",
+    "@babel/preset-env": "^7.16.11",
     "nodemon": "^2.0.15"
   }
 }

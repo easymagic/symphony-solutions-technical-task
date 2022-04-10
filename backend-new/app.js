@@ -1,72 +1,42 @@
 import express from "express";
 import createError from "http-errors";
+import Socket from "./socket";
+import CryptoService from "./crypto-service";
 
 const morgan = require("morgan");
 require("dotenv").config();
 
-const db = require("./models");
-const fetch = require("node-fetch");
-
-const exchange = require("./models/exchange");
-const Exchange = exchange(db.sequelize, db.Sequelize.DataTypes);
-const CRYPTO_PULL_INTERVAL = 5;
-const ACCESS_KEY = "ab4c6232b8c953d01f1756eb48c62235";
-const CRYPTO_URL = `http://api.coinlayer.com/api/live?access_key=${ACCESS_KEY}`;
-const TARGET_CURRENCY = "USD";
-
 const app = express();
+const { server , Schedule } = Socket(app);
 
-const server = require("http").createServer(app);
-
-const io = require('socket.io')(server,{
-  cors:{origin:"*"}
-});
-
-io.on("connection",(socket)=>{
-  console.log("Client just got connected...");
-  socket.on('message',()=>{
-     
-  });
-});
-
-// server.listen(9000);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(morgan("dev"));
 
-const fetchAndStoreLatestRates = async () => {
-  let data = await fetch(CRYPTO_URL).then((res) => res.json());
-  for (let crypto in data.rates) {
-    let check = await Exchange.findOne({ where: { crypto } });
-
-    if (check == null) {
-      await Exchange.create({
-        crypto,
-        currency: TARGET_CURRENCY,
-        rate: data.rates[crypto],
-      });
-    }
-  }
-  // console.log("Synchronized from crypto-exchange server");
-};
-
-const fetchStoredRates = async () => {
-  return await Exchange.findAll();
-};
-
-const scheduleSync = async () => {
-  await fetchAndStoreLatestRates();
-  let rates = await fetchStoredRates();
-  io.emit('message',rates);
-  // console.log(rates);
-  setTimeout(scheduleSync, CRYPTO_PULL_INTERVAL * 1000 * 60);
-};
-
-scheduleSync();
+Schedule();//sets up the cryto-service for pull and push updates using websockets
 
 app.get("/", async (req, res, next) => {
-  res.send({ message: "Awesome it works 🐻" });
+  // res.send({ message: "Awesome it works 🐻" });
+  res.send(`<!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Document</title>
+      <script src="https://cdn.socket.io/4.4.1/socket.io.min.js" integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H" crossorigin="anonymous"></script>
+      <script>
+          let socket = io('ws://127.0.0.1:3000');
+          socket.on('message',(data)=>{
+              console.log(data);
+          });
+      </script>
+  </head>
+  <body>
+      <h2>Web Socket...</h2>
+  </body>
+  </html>`);
 });
 
 app.use("/api", require("./routes/api.route"));
@@ -84,4 +54,4 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 @ http://localhost:${PORT}`));
+server.listen(PORT, () => console.log(`🚀 @ http://localhost:${PORT}`));
