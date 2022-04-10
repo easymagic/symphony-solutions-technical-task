@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DEFAULT_CURRENCY_TO = exports.TYPE_SAVED_EXCHANGE = exports.TYPE_LIVE_PRICE = void 0;
+const sequelize_1 = require("sequelize");
 const models_1 = __importDefault(require("../models"));
 const currencyexchange_1 = __importDefault(require("../models/currencyexchange"));
 const CurrencyExchange = (0, currencyexchange_1.default)(models_1.default.sequelize, models_1.default.Sequelize.DataTypes);
@@ -29,9 +30,30 @@ class CurrencyExchangeService {
             });
         });
     }
+    static sortAndFilter(dateFilter = "", sortField = "", sortOrder = "DESC") {
+        return __awaiter(this, void 0, void 0, function* () {
+            let filters = {
+                where: {},
+                order: [],
+            };
+            filters["where"].type = exports.TYPE_SAVED_EXCHANGE; //restrict filters to only saved exchanges
+            if (dateFilter) {
+                filters["where"].createdAt = {
+                    [sequelize_1.Op.gte]: dateFilter,
+                };
+            }
+            if (sortField) {
+                filters["order"].push([sortField, sortOrder]);
+            }
+            console.log(filters, 'filters');
+            return yield CurrencyExchange.findAll(filters);
+        });
+    }
     static create(data) {
         return __awaiter(this, void 0, void 0, function* () {
-            data.date_and_time = new Date().toString();
+            let $date = new Date();
+            data.date_and_time =
+                $date.toLocaleDateString() + " " + $date.toLocaleTimeString();
             return yield CurrencyExchange.create(data);
         });
     }
@@ -49,8 +71,8 @@ class CurrencyExchangeService {
         return __awaiter(this, void 0, void 0, function* () {
             return yield CurrencyExchange.count({
                 where: {
-                    'type': type
-                }
+                    type: type,
+                },
             });
         });
     }

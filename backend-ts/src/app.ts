@@ -9,7 +9,7 @@ import CurrencyExchangeService, {
 const app: Application = express();
 
 export const PORT_SOCKET_CLIENT = 5000;
-const PORT = 5000; 
+const PORT = 5000;
 
 const { server, io } = Socket(app); //initialize the socket server
 

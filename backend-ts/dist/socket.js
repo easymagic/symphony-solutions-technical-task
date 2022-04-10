@@ -37,13 +37,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Socket = void 0;
 const http_1 = __importDefault(require("http"));
+const app_1 = require("./app");
 const CurrencyExchangeService_1 = __importStar(require("./services/CurrencyExchangeService"));
 // import $socket from "socket.io";
 const Socket = (app) => {
     const server = http_1.default.createServer(app);
     const io = require("socket.io")(server, {
         cors: {
-            origin: "http://localhost:5000",
+            origin: `http://localhost:${app_1.PORT_SOCKET_CLIENT}`,
             methods: ["GET", "POST"],
         },
     });
@@ -53,13 +54,19 @@ const Socket = (app) => {
         socket.on("message", () => { });
         socket.on("save-exchange", (data) => __awaiter(void 0, void 0, void 0, function* () {
             console.log(data);
-            CurrencyExchangeService_1.default.create({
+            yield CurrencyExchangeService_1.default.create({
                 currency_from: data.currency_from,
                 amount1: data.amount1,
                 currency_to: data.currency_to,
                 amount2: yield CurrencyExchangeService_1.default.getEstimatedConversion(data.currency_from, data.currency_to, data.amount1),
                 type: CurrencyExchangeService_1.TYPE_SAVED_EXCHANGE,
             });
+            let saveExhangeList = yield CurrencyExchangeService_1.default.fetch(CurrencyExchangeService_1.TYPE_SAVED_EXCHANGE);
+            io.emit("fetch-saved-exchange", saveExhangeList);
+        }));
+        socket.on("sort", (filters) => __awaiter(void 0, void 0, void 0, function* () {
+            let sortedRecords = yield CurrencyExchangeService_1.default.sortAndFilter(filters.dateFilter, filters.sortField, filters.sortOrder);
+            io.emit("fetch-saved-exchange", sortedRecords);
         }));
     });
     return { server, io };
