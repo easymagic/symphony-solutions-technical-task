@@ -7,7 +7,7 @@
     "start": "node dist/app.js",
     "dev": "nodemon src/app.ts",
     "build": "tsc -p .",
-    "copy":"copyfiles src/config/ dist"
+    "copy":"npx copyfiles src/config/ dist/"
   },
   "keywords": [],
   "author": "",
