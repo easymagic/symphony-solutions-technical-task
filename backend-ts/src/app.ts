@@ -8,6 +8,9 @@ import CurrencyExchangeService, {
 
 const app: Application = express();
 
+export const PORT_SOCKET_CLIENT = 5000;
+const PORT = 5000; 
+
 const { server, io } = Socket(app); //initialize the socket server
 
 ScheduleSync(async (data: any) => {
@@ -54,5 +57,5 @@ app.get("/socket-test", (req: Request, res: Response) => {
     </html>`);
 });
 
-server.listen(5000, () => console.log("Socket server running on port 5000"));
+server.listen(PORT, () => console.log(`Socket server running on port ${PORT}`));
 //

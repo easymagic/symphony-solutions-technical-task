@@ -1,5 +1,6 @@
 import { Application } from "express";
 import http from "http";
+import { PORT_SOCKET_CLIENT } from "./app";
 import CurrencyExchangeService, {
   CurrencyExchangeSchema,
   TYPE_SAVED_EXCHANGE,
@@ -10,7 +11,7 @@ export const Socket = (app: Application) => {
   const server = http.createServer(app);
   const io = require("socket.io")(server, {
     cors: {
-      origin: "http://localhost:5000",
+      origin: `http://localhost:${PORT_SOCKET_CLIENT}`,
       methods: ["GET", "POST"],
     },
   });
