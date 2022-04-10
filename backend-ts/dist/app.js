@@ -13,20 +13,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const exchange_1 = __importDefault(require("./models/exchange"));
-const models_1 = __importDefault(require("./models"));
 const socket_1 = require("./socket");
 const FetchCryptoExchangeController_1 = require("./controllers/FetchCryptoExchangeController");
 const CryptoService_1 = require("./services/CryptoService");
+const CurrencyExchangeService_1 = __importDefault(require("./services/CurrencyExchangeService"));
 const app = (0, express_1.default)();
-const Exchange = (0, exchange_1.default)(models_1.default.sequelize, models_1.default.Sequelize.DataTypes);
 const { server, io } = (0, socket_1.Socket)(app); //initialize the socket server
 (0, CryptoService_1.ScheduleSync)((data) => {
     io.emit("message", data);
 });
 // console.log(fetchFakerJson());
 app.get("/", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    let count = yield Exchange.count();
+    let count = yield CurrencyExchangeService_1.default.countAll();
     res.send({
         version: "1.0.0",
         message: "Crypto exchange server",

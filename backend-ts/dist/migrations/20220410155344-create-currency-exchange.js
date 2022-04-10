@@ -11,20 +11,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 module.exports = {
     up(queryInterface, Sequelize) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield queryInterface.createTable('Exchanges', {
+            yield queryInterface.createTable('CurrencyExchanges', {
                 id: {
                     allowNull: false,
                     autoIncrement: true,
                     primaryKey: true,
                     type: Sequelize.INTEGER
                 },
-                currency: {
+                date_and_time: {
                     type: Sequelize.STRING
                 },
-                rate: {
+                currency_from: {
                     type: Sequelize.STRING
                 },
-                crypto: {
+                amount1: {
+                    type: Sequelize.STRING
+                },
+                currency_to: {
+                    type: Sequelize.STRING
+                },
+                amount2: {
+                    type: Sequelize.STRING
+                },
+                type: {
                     type: Sequelize.STRING
                 },
                 createdAt: {
@@ -40,7 +49,7 @@ module.exports = {
     },
     down(queryInterface, Sequelize) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield queryInterface.dropTable('Exchanges');
+            yield queryInterface.dropTable('CurrencyExchanges');
         });
     }
 };
