@@ -21,7 +21,7 @@ export const Socket = (app: Application) => {
     socket.on("message", () => {});
     socket.on("save-exchange", async (data: CurrencyExchangeSchema) => {
       console.log(data);
-      CurrencyExchangeService.create({
+      await CurrencyExchangeService.create({
         currency_from: data.currency_from,
         amount1: data.amount1,
         currency_to: data.currency_to,

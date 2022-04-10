@@ -47,6 +47,7 @@ export default class CurrencyExchangeService {
     if (sortField) {
       filters["order"].push([sortField, sortOrder]);
     }
+    console.log(filters,'filters');
     return await CurrencyExchange.findAll(filters);
   }
 
