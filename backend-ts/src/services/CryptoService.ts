@@ -1,44 +1,43 @@
 import db from "../models";
-import $exchange from "../models/exchange";
-// import fetch from "node-fetch";
-import { FetchExchangeRates } from "../apis/FetchExchangeRates";
-// import { where } from "sequelize/types";
+import $currencyexchange from "../models/currencyexchange";
 
-const Exchange = $exchange(db.sequelize, db.Sequelize.DataTypes);
+import { FetchExchangeRates } from "../apis/FetchExchangeRates";
+
+import CurrencyExchangeService, {
+  CurrencyExchangeSchema,
+  TYPE_LIVE_PRICE,
+} from "./CurrencyExchangeService";
 
 const INTERVAL = 5; //minutes
 
 export interface ExhangeSchema {
-  currency: any;
-  crypto: any;
-  rate: any;
+  currency: string;
+  crypto: string;
+  rate: string;
 }
 
 export const SyncCryptoData = async () => {
   let data: ExhangeSchema[] = await FetchExchangeRates();
-//   console.log(data);
   for (let i in data) {
-    //   console.log(i);
-    let { crypto, currency, rate } = data[i];
-    let count = await Exchange.count({
-      where: {
-        "crypto":data[i].crypto,
-      },
+    await CurrencyExchangeService.createIfNotExists({
+      currency_from: data[i].crypto,
+      amount1: data[i].rate,
+      currency_to: data[i].currency,
+      type: TYPE_LIVE_PRICE,
+      amount2: "",
     });
-    if (count <= 0){
-      CreateCryptoExchange({crypto,currency,rate});
-    }
   }
   return Promise.resolve("done");
 };
 
-export const ScheduleSync = async (cb:any)=>{
+export const ScheduleSync = async (cb: any) => {
+  let $fn = async () => {
     await SyncCryptoData();
-    let rates:ExhangeSchema[] = await FetchExchangeRates();
+    let rates: CurrencyExchangeSchema[] = await CurrencyExchangeService.fetch(
+      TYPE_LIVE_PRICE
+    );
     cb(rates);
-    setTimeout(ScheduleSync,INTERVAL * 1000 * 60);  
-};
-
-export const CreateCryptoExchange =(data:any)=>{
-   return Exchange.create(data);
+    setTimeout($fn, INTERVAL * 1000 * 60);
+  };
+  $fn();
 };

@@ -1,40 +1,32 @@
-import express , {Application , Request , Response , NextFunction} from "express";
-
-import exchange from "./models/exchange";
-import db from "./models";
-
-import { fetchFakerJson } from "./mock-crypto-data";
-
+import express, { Application, Request, Response, NextFunction } from "express";
 import { Socket } from "./socket";
-
 import { FetchCryptoExchangeController } from "./controllers/FetchCryptoExchangeController";
 import { ScheduleSync } from "./services/CryptoService";
+import CurrencyExchangeService from "./services/CurrencyExchangeService";
 
-const app : Application = express();
-const Exchange = exchange(db.sequelize,db.Sequelize.DataTypes);
+const app: Application = express();
 
-const {server,io} = Socket(app); //initialize the socket server
+const { server, io } = Socket(app); //initialize the socket server
 
-ScheduleSync((data:any)=>{
-    io.emit('message',data);
+ScheduleSync((data: any) => {
+  io.emit("message", data);
 });
 
 // console.log(fetchFakerJson());
 
-app.get('/',async(req:Request,res:Response,next:NextFunction)=>{
-    let count = await Exchange.count();
-    res.send({
-        version:'1.0.0',
-        message: 'Crypto exchange server',
-        info:`${count} crypto exchange rates`
-    })
+app.get("/", async (req: Request, res: Response, next: NextFunction) => {
+  let count = await CurrencyExchangeService.countAll();
+  res.send({
+    version: "1.0.0",
+    message: "Crypto exchange server",
+    info: `${count} crypto exchange rates`,
+  });
 });
 
-app.get('/crypto-exchanges',FetchCryptoExchangeController);
+app.get("/crypto-exchanges", FetchCryptoExchangeController);
 
-
-app.get('/socket-test',(req:Request,res:Response)=>{
-    res.send(`<!DOCTYPE html>
+app.get("/socket-test", (req: Request, res: Response) => {
+  res.send(`<!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -55,6 +47,5 @@ app.get('/socket-test',(req:Request,res:Response)=>{
     </html>`);
 });
 
-
-server.listen(5000,()=>console.log('Socket server running on port 5000'));
+server.listen(5000, () => console.log("Socket server running on port 5000"));
 //
