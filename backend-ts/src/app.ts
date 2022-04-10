@@ -2,14 +2,18 @@ import express, { Application, Request, Response, NextFunction } from "express";
 import { Socket } from "./socket";
 import { FetchCryptoExchangeController } from "./controllers/FetchCryptoExchangeController";
 import { ScheduleSync } from "./services/CryptoService";
-import CurrencyExchangeService from "./services/CurrencyExchangeService";
+import CurrencyExchangeService, {
+  TYPE_SAVED_EXCHANGE,
+} from "./services/CurrencyExchangeService";
 
 const app: Application = express();
 
 const { server, io } = Socket(app); //initialize the socket server
 
-ScheduleSync((data: any) => {
-  io.emit("message", data);
+ScheduleSync(async (data: any) => {
+  io.emit("fetch-live-exchange", data);
+  let savedExchange = await CurrencyExchangeService.fetch(TYPE_SAVED_EXCHANGE);
+  io.emit("fetch-saved-exchange", savedExchange);
 });
 
 // console.log(fetchFakerJson());
@@ -36,8 +40,11 @@ app.get("/socket-test", (req: Request, res: Response) => {
         <script src="https://cdn.socket.io/4.4.1/socket.io.min.js" integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H" crossorigin="anonymous"></script>
         <script>
             let socket = io('ws://127.0.0.1:5000');
-            socket.on('message',(data)=>{
-                console.log(data);
+            socket.on('fetch-live-exchange',(data)=>{
+                console.log('live-exchange',data);
+            });
+            socket.on('fetch-saved-exchange',(data)=>{
+                console.log('saved-exchange',data);
             });
         </script>
     </head>

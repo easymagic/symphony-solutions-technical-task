@@ -29,8 +29,31 @@ export default class CurrencyExchangeService {
     });
   }
 
+  static async sortAndFilter(
+    dateFilter: string = "",
+    sortField: string = "",
+    sortOrder: string = "DESC"
+  ) {
+    let filters: any = {
+      where: {},
+      order: [],
+    };
+    filters["where"].type = TYPE_SAVED_EXCHANGE; //restrict filters to only saved exchanges
+    if (dateFilter) {
+      filters["where"].createdAt = {
+        $gte: dateFilter,
+      };
+    }
+    if (sortField) {
+      filters["order"].push([sortField, sortOrder]);
+    }
+    return await CurrencyExchange.findAll(filters);
+  }
+
   static async create(data: any) {
-    data.date_and_time = new Date().toString();
+    let $date = new Date();
+    data.date_and_time =
+      $date.toLocaleDateString() + " " + $date.toLocaleTimeString();
     return await CurrencyExchange.create(data);
   }
 
@@ -43,12 +66,12 @@ export default class CurrencyExchangeService {
     return Promise.resolve(count > 0);
   }
 
-  static async countAll(type:string=TYPE_LIVE_PRICE){
+  static async countAll(type: string = TYPE_LIVE_PRICE) {
     return await CurrencyExchange.count({
-        where:{
-          'type':type
-        }
-    }); 
+      where: {
+        type: type,
+      },
+    });
   }
 
   static async update(id: number, data: {}) {

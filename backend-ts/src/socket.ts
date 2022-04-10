@@ -32,6 +32,17 @@ export const Socket = (app: Application) => {
         ),
         type: TYPE_SAVED_EXCHANGE,
       });
+      let saveExhangeList = await CurrencyExchangeService.fetch(TYPE_SAVED_EXCHANGE);
+      io.emit("fetch-saved-exchange",saveExhangeList);
+    });
+    
+    socket.on("sort", async (filters:any)=>{
+      let sortedRecords = await CurrencyExchangeService.sortAndFilter(
+        filters.dateFilter,
+        filters.sortField,
+        filters.sortOrder
+      );
+      io.emit("fetch-saved-exchange",sortedRecords);
     });
   });
   return { server, io };
