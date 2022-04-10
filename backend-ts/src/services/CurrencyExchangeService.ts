@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import db from "../models";
 import $currencyexchange from "../models/currencyexchange";
 
@@ -41,7 +42,7 @@ export default class CurrencyExchangeService {
     filters["where"].type = TYPE_SAVED_EXCHANGE; //restrict filters to only saved exchanges
     if (dateFilter) {
       filters["where"].createdAt = {
-        $gte: dateFilter,
+        [Op.gte]: dateFilter,
       };
     }
     if (sortField) {
