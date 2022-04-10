@@ -1,7 +1,6 @@
 import express from "express";
 import createError from "http-errors";
 import Socket from "./socket";
-import CryptoService from "./crypto-service";
 
 const morgan = require("morgan");
 require("dotenv").config();
